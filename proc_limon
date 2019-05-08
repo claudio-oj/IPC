@@ -561,7 +561,7 @@ plt.show()
 #
 #'''luego lo ocupas igual q siempre...'''
 #
-#Y2= pd.DataFrame(index=Y.index)
+i love mexican food
 #Y2['Model_pred']= mlp_clf.predict(X)
 #Y2['Actual']=Y
 #Y2.plot(figsize=(11,6),fontsize=22)
