@@ -12,16 +12,30 @@ plt.style.use('seaborn')
 
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import PolynomialFeatures  
 
 
-
-def run_model(model, X, Y):
-    """ corre modelos de Machine Learning y crea graficos """
-    X_train, X_test, Y_train, Y_test= train_test_split(X,Y, test_size=0.2,random_state=1)
-    m0=len(X_train.copy())
+def run_model(model, X, Y,grafs=True):
+    """ corre modelos de Machine Learning y crea graficos
+    grafs: imprime graficos"""
+    
+    # solo define el largo de la muestra de trainig
+    X_train, _, _, _= train_test_split(X,Y, test_size=0.2)
+    m0= len(X_train.copy())
+    
     train_errors, test_errors, perc75_errors, perc95_errors=[],[],[],[]
     
+    #escala la data
+    poly_features= PolynomialFeatures(degree=1,include_bias=False)
+    data_poly= poly_features.fit_transform(X)
+    scaler= StandardScaler()
+    data_poly= scaler.fit_transform(data_poly)
+    
     for m in range(5,m0+1):
+        
+        X_train, X_test, Y_train, Y_test= train_test_split(data_poly,Y,test_size=0.2)
+                
         model.fit(X_train[:m],Y_train[:m])
         Y_train_pred= model.predict(X_train)
         Y_test_pred= model.predict(X_test)
@@ -41,23 +55,26 @@ def run_model(model, X, Y):
     print('75th percentile of test MAE ',round(100*np.mean(perc75_errors[-50:]) ,2))
     print('95th percentile of test MAE ',round(100*np.mean(perc95_errors[-50:]) ,2))
     
-    # PLot learning Curves
-    learning_curves.plot(figsize=(11,6),fontsize=22)
-    plt.xlabel("Training set size",fontsize=18)
-    plt.ylabel("Mean Absolute Error",fontsize=18)
-    plt.title("Model Learning Error Curves", fontsize=22)
-    plt.legend(prop={'size': 18})
-    plt.ylim(ymin=0)
-    plt.show()
     
-    #Modelo Final    
-    Y2= pd.DataFrame(index=Y.index)
-    Y2['Model_pred']= model.predict(X)
-    Y2['Actual']=Y
-    Y2.plot(figsize=(11,6),fontsize=22)
-    plt.title("Model vs Actual", fontsize=22)
-    plt.legend(prop={'size': 18})
-    plt.show()
+    if grafs==True:        
+    
+        # PLot learning Curves
+        learning_curves.plot(figsize=(11,6),fontsize=22)
+        plt.xlabel("Training set size",fontsize=18)
+        plt.ylabel("Mean Absolute Error",fontsize=18)
+        plt.title("Model Learning Error Curves", fontsize=22)
+        plt.legend(prop={'size': 18})
+        plt.ylim(ymin=0)
+        plt.show()
+        
+        #Modelo Final    
+        Y2= pd.DataFrame(index=Y.index)
+        Y2['Model_pred']= model.predict(X)
+        Y2['Actual']=Y
+        Y2.plot(figsize=(11,6),fontsize=22)
+        plt.title("Model vs Actual", fontsize=22)
+        plt.legend(prop={'size': 18})
+        plt.show()
     
     
 
