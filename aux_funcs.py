@@ -16,10 +16,49 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import PolynomialFeatures  
 
 
-def run_model(model, X, Y,grafs=True):
-    """ corre modelos de Machine Learning y crea graficos
-    grafs: imprime graficos"""
+def crealag(df, n):
+    new_columns = ["{}_Lag{:02d}".format(variable, n) for variable in df.columns]
+    new_df = df.shift(n)
+    new_df.columns = new_columns
+    return new_df
+
+
+def run_model(model, X, Y,lags=False,grafs=True):
+    """ Corre modelos de Machine Learning, escala data, entrega metricas de performance
+    y crea graficos
     
+    Parameters
+    ----------
+    
+    model: objeto model sklearn
+    
+    X: DataFrame. features
+    
+    Y: DataFrame. etiquetas    
+    
+    grafs : boolean, imprime graficos.
+    
+    lags : list de integers (de lags de X a incluir). i.e. lags=[1,2,12]
+    
+    output : DataFrame con las metricas de performance del modelo
+    """
+    
+    """ crea lags """
+    if lags != False:
+        dlags={}
+        
+        #crea df's de lags
+        for i in lags:
+            dlags[i]= crealag(X, i)
+                 
+        # concat df de X con los df de lags   
+        for i in lags:            
+            X= pd.concat([X,dlags[i]],axis=1)
+        
+        # elimina las filas que quedan en desuso x la creación de nan's
+        X.dropna(inplace=True)
+        Y=Y.iloc[lags[-1]:,:]
+        
     # solo define el largo de la muestra de trainig
     X_train, _, _, _= train_test_split(X,Y, test_size=0.2)
     m0= len(X_train.copy())
@@ -50,12 +89,6 @@ def run_model(model, X, Y,grafs=True):
     learning_curves=np.concatenate((train_errors.reshape(-1,1),test_errors.reshape(-1,1)),axis=1)
     learning_curves=pd.DataFrame(data=learning_curves,columns=["train_error","test_error"])
     
-    print('train MAE ', round(100*np.mean(train_errors[-50:]) ,2) )
-    print('test MAE ',  round(100*np.mean(test_errors[-50:])  ,2) )
-    print('75th percentile of test MAE ',round(100*np.mean(perc75_errors[-50:]) ,2))
-    print('95th percentile of test MAE ',round(100*np.mean(perc95_errors[-50:]) ,2))
-    
-    
     if grafs==True:        
     
         # PLot learning Curves
@@ -75,6 +108,13 @@ def run_model(model, X, Y,grafs=True):
         plt.title("Model vs Actual", fontsize=22)
         plt.legend(prop={'size': 18})
         plt.show()
+    
+    return pd.DataFrame([round(100*np.mean(train_errors[-50:]) ,2),
+              round(100*np.mean(test_errors[-50:])  ,2),
+              round(100*np.mean(perc75_errors[-50:]) ,2),
+              round(100*np.mean(perc95_errors[-50:]) ,2)],         
+             index=['train MAE','test MAE','75th percentile of test MAE','95th percentile of test MAE'],
+             columns=['performance'])
     
     
 
@@ -122,10 +162,5 @@ def interp(df, new_index):
 
     return df_out
 
-def crealag(df, n):
-    new_columns = ["{}_Lag{:02d}".format(variable, n) for variable in df.columns]
-    new_df = df.shift(n)
-    new_df.columns = new_columns
-    return new_df
+
     
-#hola pollo
