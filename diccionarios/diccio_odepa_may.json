@@ -4234,34 +4234,34 @@
         [
             1a (cosecha)
             1a nueva(o)
-            2a (delgada nueva)
-            3a (revuelta cosecha)
-            s/e (semillón nueva)
-            3a (revuelta nueva)
-            s/e (semillón cosecha)
-            2a (delgada cosecha)
-            Extra (muy buena nueva)
-            2a (cosecha)
-            2a nueva(o)
-            1a (guarda)
-            2a (guarda)
-            1a (cosecha lavada)
-            1a (nueva lavada)
+            # 2a (delgada nueva)
+            # 3a (revuelta cosecha)
+            # s/e (semillón nueva)
+            # 3a (revuelta nueva)
+            # s/e (semillón cosecha)
+            # 2a (delgada cosecha)
+            # Extra (muy buena nueva)
+            # 2a (cosecha)
+            # 2a nueva(o)
+            # 1a (guarda)
+            # 2a (guarda)
+            # 1a (cosecha lavada)
+            # 1a (nueva lavada)
         ]
         Mercado:
         [
             Central Lo Valledor de Santiago
-            Mapocho venta directa de Santiago
+            # Mapocho venta directa de Santiago
             Vega poniente de Santiago
             Vega Central Mapocho de Santiago
             Macroferia Regional de Talca
-            Vega Monumental Concepción
+            # Vega Monumental Concepción
             Femacal de La Calera
-            Terminal La Palmera de La Serena
-            Vega Modelo de Temuco
-            Feria Lagunitas de Puerto Montt
-            Agrícola del Norte S.A. de Arica
-            Terminal Hortofrutícola de Chillán
+            # Terminal La Palmera de La Serena
+            # Vega Modelo de Temuco
+            # Feria Lagunitas de Puerto Montt
+            # Agrícola del Norte S.A. de Arica
+            # Terminal Hortofrutícola de Chillán
         ]
         Origen:
         [
@@ -4277,7 +4277,7 @@
             Región de Valparaíso
             Región de O'Higgins
             Provincia de Limarí
-            Argentina
+            # Argentina
             Región de Arica y Parinacota
             Provincia del Biobío
             Provincia de Curicó
