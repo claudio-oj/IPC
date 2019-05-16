@@ -13,6 +13,7 @@ import os
 os.chdir('D:\\Dropbox\\BA\\Clientes\\HSBC\\2 IPC\\modelos_por_producto\\')
 import pandas as pd
 import hjson
+import time
 
 
 """ 1  IMPORTA/FORMATEA/LIMPIA/ BASE DE DATOS ODEPA   """
@@ -47,7 +48,7 @@ keys2= ['Mercado','Variedad','Calidad','Origen','Unidad decomercialización']
 
 # puebla diccionario grande en base a todos los "chicos por producto"
 for i in keys1:    
-    values2= [list(df[x].unique()) for x in keys2]
+    values2= [list(df[df.Producto==i][x].unique()) for x in keys2]
     dic_chico = dict(zip(keys2, values2))  
     dic_grande[i]= dic_chico
 
@@ -55,23 +56,8 @@ for i in keys1:
 
 
 """ GUARDA DICCIONARIO """
+x= time.localtime()
+x= 'diccioh_'+str(x[0])+'_'+str(x[1])+'_'+str(x[2])+'.json'
 
-with open('diccioh.json', 'w') as fp:
+with open(x, 'w') as fp:
     hjson.dump(dic_grande, fp, sort_keys=True, indent=4)
-
-#%%
-    
-    
-""" LLAMA DICCIONARIO """
-
-with open('hdiccio.json') as fp:
-    data= hjson.loads(fp.read())
-    
-#%%
-    
-    
-
-
-
-
-
