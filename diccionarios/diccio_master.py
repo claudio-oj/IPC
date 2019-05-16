@@ -61,3 +61,10 @@ x= 'diccioh_'+str(x[0])+'_'+str(x[1])+'_'+str(x[2])+'.json'
 
 with open(x, 'w') as fp:
     hjson.dump(dic_grande, fp, sort_keys=True, indent=4)
+
+    
+    
+""" LLAMA DICCIONARIO """
+
+with open('diccioh_2019_5_16.json') as fp:
+    data= hjson.loads(fp.read())
