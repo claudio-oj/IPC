@@ -6,7 +6,7 @@ Created on Wed Apr 10 12:35:18 2019       python 3.6
 """
 
 import os
-os.chdir('D:\\Dropbox\\BA\\Clientes\\HSBC\\2 IPC\\modelos_por_producto\\')
+os.chdir('D:\\BA\\Clientes\\HSBC\\2_IPC\\modelos_por_producto\\')
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,7 +31,6 @@ dfine2.columns=["ine"]
 dfine2.index= pd.to_datetime(dfine2.index)
 
 dfine= pd.concat([dfine2,dfine])
-
 
 
 # transforma fecha a fin de mes
@@ -217,6 +216,7 @@ dfine.dropna(inplace=True)
 df=dfine
 del c, calidades,col,dfine,dfine2,dfc,dfcgrow,dfcshift,filter_list,ilug,ind,row,x
 
+
 #%%
 ###############################################################################
 ###############################################################################
@@ -234,20 +234,14 @@ Redes """
 """ 2.1.         REGRESION LINEAL, SIN LAGS         buen punto de partida..."""
 
 
-from sklearn.linear_model import LinearRegression     
+from sklearn.linear_model import LinearRegression   
 
 #crea X,Y
 Y= pd.DataFrame(df.iloc[:,0])
 X= df.iloc[:,1:]
 
-# crea modelo Regresion Lineal
-lin_reg=LinearRegression()
-lin_reg.fit(X,Y)
-lin_reg.intercept_, lin_reg.coef_
-
-
 # corre modelo, genera metricas y graficos
-run_model(lin_reg,X, Y)
+run_model(LinearRegression(),X,Y, lags=[1,2,12],grafs=False)
 
 
 
@@ -260,12 +254,13 @@ run_model(lin_reg,X, Y)
 from sklearn.linear_model import LinearRegression  
 
 # crea X con lags
-df2= pd.concat([ df, crealag(df.iloc[:,1:],1), crealag(df.iloc[:,1:],2) ] , axis=1)
+df2= pd.concat([ df, crealag(df.iloc[:,1:],1), crealag(df.iloc[:,1:],3) ] , axis=1)
 df2.dropna(inplace=True)
 
 #crea X,Y
-Y= pd.DataFrame(df.iloc[2:,0])
+Y= pd.DataFrame(df.iloc[3:,0])
 X= df2.iloc[:,1:]
+
 
 # crea modelo Regresion Lineal
 lin_reg=LinearRegression()
@@ -274,28 +269,28 @@ lin_reg.intercept_, lin_reg.coef_
 
 
 # corre modelo, genera metricas y graficos
-run_model(lin_reg,X, Y)
+run_model(lin_reg,X,Y)
 
 
 #%%
 
 
-""" 2.3         REGRESION LINEAL de 2do Orden CON 2 LAGS,         es malo"""
+""" 2.3         REGRESION LINEAL de 2do Orden CON 3 LAGS,         es malo"""
 
 from sklearn.linear_model import LinearRegression  
 from sklearn.preprocessing import PolynomialFeatures
 
     
 # crea X con lags
-df2= pd.concat([ df, crealag(df.iloc[:,1:],1), crealag(df.iloc[:,1:],2) ] , axis=1)
+df2= pd.concat([ df, crealag(df.iloc[:,1:],1), crealag(df.iloc[:,1:],3) ] , axis=1)
 df2.dropna(inplace=True)
 
 #crea X,Y
-Y= pd.DataFrame(df.iloc[2:,0])
+Y= pd.DataFrame(df.iloc[3:,0])
 X= df2.iloc[:,1:]
 
 # WARNING: DEGREE >=2 PRODUCE MUCHO OVERFITING
-poly_features= PolynomialFeatures(degree=2,include_bias=False)
+poly_features= PolynomialFeatures(degree=1,include_bias=False)
 data_poly= poly_features.fit_transform(X)
 
 # crea modelo Regresion Lineal
@@ -479,8 +474,8 @@ y_pred_tst= mlp_clf.predict(X_test)
 train_error=mean_absolute_error(Y_train,y_pred_tr)
 test_error=mean_absolute_error(Y_test,y_pred_tst)
 
-print('train error ', round(100*train_error))
-print('test error ',  round(100*test_error))
+print('train error ', round(100*train_error,2))
+print('test error ',  round(100*test_error,2))
 print('95th percentile of Test Error ',round( 100*np.percentile(test_error,3)))
 
 #Modelo Final    
