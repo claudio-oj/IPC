@@ -23,6 +23,15 @@ def crealag(df, n):
     return new_df
 
 
+def da(Y_test,Y_pred):
+    """ directional accuracy metric
+    Y_test, Y_pred: pd.Series"""
+    
+    prod= Y_test * Y_pred   
+    
+    return prod.gt(0).sum() / len(prod)
+
+
 def run_model(model, X, Y,lags=False,grafs=True):
     """ Corre modelos de Machine Learning, escala data, entrega metricas de performance
     y crea graficos
@@ -63,7 +72,7 @@ def run_model(model, X, Y,lags=False,grafs=True):
     X_train, _, _, _= train_test_split(X,Y, test_size=0.2)
     m0= len(X_train.copy())
     
-    train_errors, test_errors, perc75_errors, perc95_errors=[],[],[],[]
+    train_errors, test_errors, test_da, perc75_errors, perc95_errors=[],[],[],[],[]
     
     #escala la data
     poly_features= PolynomialFeatures(degree=1,include_bias=False)
@@ -78,8 +87,11 @@ def run_model(model, X, Y,lags=False,grafs=True):
         model.fit(X_train[:m],Y_train[:m])
         Y_train_pred= model.predict(X_train)
         Y_test_pred= model.predict(X_test)
+        
         train_errors.append(mean_absolute_error(Y_train,Y_train_pred))
         test_errors.append(mean_absolute_error(Y_test,Y_test_pred))
+        test_da.append( da(Y_test,Y_test_pred) )
+        
         perc95_errors.append(np.percentile(abs(Y_test.values-Y_test_pred) ,95))
         perc75_errors.append(np.percentile(abs(Y_test.values-Y_test_pred) ,75))
     
@@ -111,9 +123,10 @@ def run_model(model, X, Y,lags=False,grafs=True):
     
     return pd.DataFrame([round(100*np.mean(train_errors[-50:]) ,2),
               round(100*np.mean(test_errors[-50:])  ,2),
+              round(100*np.mean(test_da[-50:])  ,2),              
               round(100*np.mean(perc75_errors[-50:]) ,2),
               round(100*np.mean(perc95_errors[-50:]) ,2)],         
-             index=['train MAE','test MAE','75th percentile of test MAE','95th percentile of test MAE'],
+             index=['train MAE','test MAE','test_da','75th percentile of test MAE','95th percentile of test MAE'],
              columns=['performance'])
     
     
@@ -161,6 +174,14 @@ def interp(df, new_index):
         df_out[colname] = np.interp(new_index, df.index, col)
 
     return df_out
+
+
+
+
+
+
+
+    
 
 
     
