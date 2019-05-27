@@ -5,8 +5,13 @@ Created on Wed Apr 10 12:35:18 2019       python 3.6
 @author: COJ https://www.odepa.gob.cl/precios/series-historicas-de-frutas-y-hortalizas
 """
 
+###############################################################################
+""" Directorio raiz, a modificar por cada usuario """
+root= 'D:\\Dropbox\\Documentos\\IPC_ML\\'
+###############################################################################
+
 import os
-os.chdir('D:\\BA\\Clientes\\HSBC\\2_IPC\\modelos_por_producto\\')
+os.chdir(root+'Git')
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,7 +20,7 @@ from aux_funcs import P_equiv,isnan,crealag,run_model
 
 
 """ 1.1    IMPORTA INDICE PUBLICADO INE DEL LIMON """
-dfine= pd.read_excel('Analisis_ranking_vol_explicada_IPC.xlsx',header=4,usecols=range(6,67))
+dfine= pd.read_excel(root+'Data\\Analisis_ranking_vol_explicada_IPC.xlsx',header=4,usecols=range(6,67))
 dfine= dfine[dfine['GLOSA']=='LIMÓN']
 dfine= dfine.T
 dfine= dfine.iloc[1:]
@@ -23,7 +28,7 @@ dfine.columns=["ine"]
 dfine.index= pd.to_datetime(dfine.index)
 
 # empalma archivo mas antiguo
-dfine2= pd.read_excel('ipc_producto_referencial_diciembre2013.xlsx',header=4,usecols=range(6,67))
+dfine2= pd.read_excel(root+'Data\\ipc_producto_referencial_diciembre2013.xlsx',header=4,usecols=range(6,67))
 dfine2= dfine2[dfine2['GLOSA']=='LIMON']
 dfine2= dfine2.T
 dfine2= dfine2.iloc[1:]
@@ -50,7 +55,7 @@ dfine= dfine.pct_change()
 
 """ 1.2   IMPORTA/FORMATEA/LIMPIA/ NUEVA BASE DE DATOS ODEPA --> LIMON  """
 
-df= pd.read_csv('precios_frutas_hortalizas_odepa.csv',sep="\t",encoding="latin-1",
+df= pd.read_csv(root+'Data\\precios_frutas_hortalizas_odepa.csv',sep="\t",encoding="latin-1",
                 decimal=',')
 df= df[df.Producto=='Limón']
 df=df.iloc[:,1:]
