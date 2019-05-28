@@ -1,8 +1,5 @@
-<img src="https://github.com/claudio-oj/IPC/blob/master/imagenes/logo_BA.JPG"
-     width="100"
-     class="center"
-      />
-
+<center> <img src="https://github.com/claudio-oj/IPC/blob/master/imagenes/logo_BA.JPG" width="100" />
+</center>
 
 # IPC_model
 data, proceso, modelos
