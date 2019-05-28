@@ -1,6 +1,7 @@
-<img src="https://static.wixstatic.com/media/963559_aa62287269154585a1a8c607ecf64fc4~mv2.gif"
-     width="100" 
-     style="float: center" />
+<img src="https://github.com/claudio-oj/IPC/blob/master/imagenes/logo_BA.JPG"
+     width="100"
+     class="center"
+      />
 
 
 # IPC_model
