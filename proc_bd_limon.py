@@ -84,9 +84,9 @@ for x in ['Mercado','Variedad','Calidad','Origen','Unidad decomercialización']:
     print()
 
 # calcula # kilos en Unidad de comercialización
-df['kilos']= df['Unidad decomercialización'].apply(lambda x: P_equiv(x))
+df['ud_com']= df['Unidad decomercialización'].apply(lambda x: P_equiv(x))
 
-df['pk']= df.Preciopromedio / df.kilos
+df['pk']= df.Preciopromedio / df.ud_com
 
 
 

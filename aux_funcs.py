@@ -133,6 +133,7 @@ def run_model(model, X, Y,lags=False,grafs=True):
 
 def get_num(string):  
     '''This function retrieves numbers from a string and converts them to integers'''  
+   
     # Create empty string to store numbers as a string  
     num = ''  
     # Loop through characters in the string  
@@ -145,20 +146,39 @@ def get_num(string):
     return integer  
 
 
+
 def P_equiv(x0):
-    """ transforma la unidad de comercializacion a -->  # de kilos
+    """ transforma la unidad de comercializacion a -->  # de kilos o # unidades
     x: str """
-    try:
-        x1= get_num(x0)
-
-        if '$/kilo' in x0:
-            return 1    
-        else:        
-            return int(x1)
-
-    except:
-        return float('nan')
     
+    #exactamente iguales
+    if '$/kilo'==x0 or '$/unidad' == x0:
+        return 1
+    elif '$/cien' == x0:
+        return 100
+    
+    # numero dentro de string
+    else: 
+        try:            
+            if '$/kilo' in x0  or  '$/unidad' in x0:
+                return 1
+            
+            elif ('$/bins' or '$/caja') and 'kilos' in x0:
+                x1= get_num(x0)
+                return int(x1)
+            
+            elif '$/caja' and 'unidades' in x0:
+                x1= get_num(x0)
+                return int(x1)
+            
+            else:   
+                x1= get_num(x0)
+                return int(x1)
+    
+        except:
+            return float('nan')
+
+
 def isnan(num):
     " evalua si num es nan"
     return num != num
@@ -175,4 +195,19 @@ def interp(df, new_index):
 
     return df_out
 
-#linea de prueba para github
+
+
+def limpia(s):
+    ''' proceso 0 funcion que reemplaza acentos para uniformar nombres de productos '''
+
+    import re
+    from unicodedata import normalize
+    # -> NFD y eliminar diacríticos
+    s = re.sub(
+            r"([^n\u0300-\u036f]|n(?!\u0303(?![\u0300-\u036f])))[\u0300-\u036f]+", r"\1", 
+            normalize( "NFD", s), 0, re.I
+        )
+    
+    # -> NFC
+    s = normalize( 'NFC', s)
+    return s
