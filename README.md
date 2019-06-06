@@ -10,6 +10,8 @@ Diccionarios:
   - codigo que crea diccionario en formato HJSON de caracteristicas x producto odepa mayorista.
   - codigo que crea diccionario en formato HJSON de caracteristicas x producto odepa consumidor
 
+Modelos:
+  - guarda los modelos ML entrenados, de acuerdo a la metodologia de grupos (G1,G2,G3...)
 
   
 <img src="https://github.com/claudio-oj/IPC/blob/master/imagenes/ipc_ml_diagram.png"

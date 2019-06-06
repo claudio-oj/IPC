@@ -16,41 +16,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('seaborn')
-from aux_funcs import P_equiv,isnan,crealag,run_model
+from aux_funcs import ipc_import,P_equiv,isnan,crealag,run_model
 
 
 """ 1.1    IMPORTA INDICE PUBLICADO INE DEL LIMON """
-dfine= pd.read_excel(root+'Data\\Analisis_ranking_vol_explicada_IPC.xlsx',header=4,usecols=range(6,67))
-dfine= dfine[dfine['GLOSA']=='LIMÓN']
-dfine= dfine.T
-dfine= dfine.iloc[1:]
-dfine.columns=["ine"]
-dfine.index= pd.to_datetime(dfine.index)
-
-# empalma archivo mas antiguo
-dfine2= pd.read_excel(root+'Data\\ipc_producto_referencial_diciembre2013.xlsx',header=4,usecols=range(6,67))
-dfine2= dfine2[dfine2['GLOSA']=='LIMON']
-dfine2= dfine2.T
-dfine2= dfine2.iloc[1:]
-dfine2.columns=["ine"]
-dfine2.index= pd.to_datetime(dfine2.index)
-
-dfine= pd.concat([dfine2,dfine])
-
-
-# transforma fecha a fin de mes
-dfine.index= dfine.resample('M', convention='end').asfreq().index
-
-dfine= dfine.pct_change()
-
-##Plot limon INE
-#dfine.plot(figsize=(10,6),fontsize=22)
-#plt.title("cambio % Limon INE", fontsize=22)
-#plt.legend(prop={'size': 18})
-#plt.xlabel('Time',fontsize=18)
-#plt.show()
-
-
+dfine= ipc_import(root=root,producto='LIMON')
 
 
 """ 1.2   IMPORTA/FORMATEA/LIMPIA/ NUEVA BASE DE DATOS ODEPA --> LIMON  """
@@ -140,7 +110,6 @@ calidades = [
         '1a plateado',
         '3a amarillo',
         '2a plateado',
-        '3a plateado'
                ]
 df= df[df.Calidad.isin(calidades)]
 

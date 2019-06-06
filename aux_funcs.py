@@ -5,6 +5,7 @@ Created on Tue Apr 30 16:25:51 2019
 @author: COJ
 """
 
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -211,3 +212,201 @@ def limpia(s):
     # -> NFC
     s = normalize( 'NFC', s)
     return s
+
+
+def ipc_import(root,producto):
+    
+    """ Función que importa df del ipc (en %), del producto...
+    
+    root: Directorio raiz, a modificar por cada usuario i.e 'D:\\Dropbox\\Documentos\\IPC_ML\\' 
+    
+    producto: str i.e 'LIMON'
+    """
+    
+    from dateutil.parser import parse
+    os.chdir(root+'Git')
+        
+    """ 1 empalma archivo mas antiguo """
+    df1= pd.read_excel(root+'Data\\ipc_producto_referencial_diciembre2013.xlsx',header=4,usecols=range(6,67))
+    df1= df1[df1['GLOSA']==producto]
+    df1= df1.T
+    df1= df1.iloc[1:]
+    df1.columns=["ine"] 
+    df1.index= pd.to_datetime(df1.index)
+    
+    
+    """ 2 empalma archivo del medio """
+    df2= pd.read_excel(root+'Data\\Analisis_ranking_vol_explicada_IPC.xlsx',header=4,usecols=range(6,67))
+    df2= df2[df2['GLOSA']==producto]
+    df2= df2.T
+    df2= df2.iloc[1:]
+    df2.columns=["ine"]
+    df2.index= pd.to_datetime(df2.index)
+    
+    
+    """ 3 empalma archivo más nuevo """
+    df3= pd.read_excel(root+'Data\\ipc-2019-xls.xlsx',header=3,usecols=range(0,10+1))
+    df3['Glosa']=df3['Glosa'].apply(lambda x: limpia(x))
+    df3= df3[df3['Glosa']==producto]
+    
+    # crea indice datetime
+    df3.index= [parse(str(df3['Año'][x])+' '+str(df3['Mes'][x]) +' 1') for x in df3.index]
+    df3 = df3.rename(columns={'Índice': 'ine'})
+    df3= df3[['ine']]
+    
+    
+    """ 4= 1+2+3 concat todo """
+    df= pd.concat([df1,df2,df3])
+    
+    # transforma fecha a fin de mes
+    df.index= df.resample('M', convention='end').asfreq().index
+    
+    return df.pct_change()
+    
+#ipc_import(root='D:\\Dropbox\\Documentos\\IPC_ML\\',producto='PALTA')
+    
+
+
+def odepa_may_impo(root='D:\\Dropbox\\Documentos\\IPC_ML\\', producto='Limon'):
+    
+    """ importa base odepa mayorista
+    
+    Parameters
+    ----------
+    root:
+    producto: str o list of strings
+    return: df
+    """
+
+    import os
+    os.chdir(root+'Git')
+    import hjson
+    from aux_funcs import P_equiv
+    
+    
+    """ 1.2   IMPORTA/FORMATEA/LIMPIA/ NUEVA BASE DE DATOS ODEPA  """
+    
+    df= pd.read_csv(root+'Data\\precios_frutas_hortalizas_odepa.csv',sep="\t",
+                    encoding="latin-1",decimal=',', index_col=0)
+    
+    df= df[df.Producto.isin([producto])]
+    
+    df.Desde= pd.to_datetime(df.Desde,dayfirst=True)
+    df.Hasta= pd.to_datetime(df.Hasta,dayfirst=True)
+    
+    
+    # elimina puntos para que pueda evaluar correctamente: puntos como "thousands separator"
+    for x in ['Volumen','Preciominimo','Preciomaximo','Preciopromedio']:
+        df[x]= df[x].apply(lambda x: x.replace('.',''))
+    
+    # transforma str --> numeric
+    for x in ['Volumen','Preciominimo','Preciomaximo','Preciopromedio']:
+        df[x]= pd.to_numeric(df[x], errors='coerce')
+    
+    # calcula # kilos en Unidad de comercialización
+    df['ud_com']= df['Unidad decomercializacion'].apply(lambda x: P_equiv(x))
+    df['p']= df.Preciopromedio / df.ud_com
+    
+    
+    
+    """ filtra según criterios de diccionario """
+    
+    with open(root+'Git\\diccionarios\\diccio_odepa_may.json') as fp:
+        d= hjson.loads(fp.read())
+    
+    df= df[ df.Variedad.isin( d[producto]['Variedad']  )]
+    df= df[ df.Mercado.isin( d[producto]['Mercado']  )]
+    df= df[ df.Origen.isin( d[producto]['Origen']  )]
+    df= df[ df.Calidad.isin( d[producto]['Calidad']  )]
+    df= df[ df['Unidad decomercializacion'].isin( d[producto]['Unidad decomercializacion']  )]
+    
+    # creo df con index fechas unicas, para guardar series de calidades del limon.
+    dfc= pd.DataFrame(index=df.Hasta.unique())
+    
+    for c in df.Calidad.unique():
+        dfc[c]= df[df.Calidad==c].groupby('Hasta').apply(lambda x: np.average(x.p, weights=x.Volumen))
+    
+    # crea df con cambios porcentuales de cada CALIDAD del limon
+    dfcgrow= dfc.pct_change(limit=1)
+    
+    # pisa con nan's los ceros de la formula pct --> evita calc erroneos
+    dfcgrow= dfcgrow.where(dfc.isna()==False,dfc)
+    
+    # promedia los pct de cada calidad en una sola columna
+    dfcgrow= dfcgrow.mean(axis=1)
+
+    # pisa los nan de crecimiento con el pct fila anterior
+    dfcgrow= dfcgrow.interpolate(method='pad')
+    
+    
+    
+    """     PUEBLA LOS NAN CON EL CRECIMIENTO PROMEDIO DE DFCGROW """
+    
+    for col in dfc.columns:
+        for ind,row in dfc[col].iteritems():
+            
+            if isnan(row)==True:
+                # indice ordinal
+                ilug= dfc[col].index.get_loc(ind)                   
+                dfc[col][ind]= dfc[col].iloc[ilug-1] * (1+dfcgrow[ind])
+    
+    
+    # alarga el indice a nivel "cambio diario"
+    dfc= dfc.reindex( pd.date_range(start=dfc.index[0], end=dfc.index[-1]))
+    dfc= dfc.interpolate(method='index')
+    
+    #mensualiza
+    dfc= dfc.asfreq('M')
+    dfc= dfc.pct_change()
+    
+    dfc.dropna(inplace=True)
+    
+    return dfc
+
+
+
+###############################################################################
+###############################################################################
+
+
+def odepa_cons_impo(root='D:\\Dropbox\\Documentos\\IPC_ML\\', producto='Limón'):
+    
+    """ importa base odepa mayorista
+    
+    Parameters
+    ----------
+    root:
+    producto: str o list of strings
+    return: df
+    """
+
+    import os
+    os.chdir(root+'Git')
+    import pandas as pd
+#    from aux_funcs import P_equiv,limpia
+    
+    
+    """ 1.2   IMPORTA/FORMATEA/LIMPIA/ BASE DE DATOS ODEPA CONSUMIDOR """
+    
+    if producto=='Limón':
+    
+        df= pd.read_csv(root+'Data\\Bases_precio_consumidor\\precios_al_consumidor_Frutas.csv',
+                        sep="\t", encoding="latin-1",decimal=',', index_col=0)
+        
+        df= df[df.Producto.isin([producto])]
+        
+        df['Fecha inicio'] = pd.to_datetime(df['Fecha inicio'],dayfirst=True)
+        df['Fecha término']= pd.to_datetime(df['Fecha término'],dayfirst=True)    
+        
+        # pasa a mayuscula los valores de la col Producto
+        df['Producto']=df['Producto'].map(lambda x: str(x).upper())
+        
+        # elimina acento y caracteres extraños
+        df['Producto']=df['Producto'].apply(lambda x: limpia(x))
+        
+        return df
+    
+    else:
+        return print('nada')
+    
+

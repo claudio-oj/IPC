@@ -9,33 +9,43 @@ Crea diccionario hjson de productos odepa con las caracteristicas de cada produc
 https://stackoverflow.com/questions/7100125/storing-python-dictionaries
 """
 
+###############################################################################
+""" Directorio raiz, a modificar por cada usuario """
+root= 'D:\\Dropbox\\Documentos\\IPC_ML\\'
+###############################################################################
+
+
 import os
-os.chdir('D:\\Dropbox\\BA\\Clientes\\HSBC\\2 IPC\\modelos_por_producto\\')
+os.chdir(root+'Git\\')
 import pandas as pd
 import hjson
 import time
+from aux_funcs import limpia
 
 
 """ 1  IMPORTA/FORMATEA/LIMPIA/ BASE DE DATOS ODEPA   """
 
-df= pd.read_csv('precios_frutas_hortalizas_odepa.csv',sep="\t",encoding="latin-1",
+df= pd.read_csv(root+'Data\\precios_frutas_hortalizas_odepa.csv',sep="\t",encoding="latin-1",
                 decimal=',')
 df=df.iloc[:,1:]  
 
 # elimina puntos para que pueda evaluar correctamente: puntos como "thousands separator"
-for x in ['Volumen','Preciomínimo','Preciomáximo','Preciopromedio']:
+for x in ['Volumen','Preciominimo','Preciomaximo','Preciopromedio']:
     df[x]= df[x].apply(lambda x: x.replace('.',''))
 
 # transforma str --> numeric
-for x in ['Volumen','Preciomínimo','Preciomáximo','Preciopromedio']:
+for x in ['Volumen','Preciominimo','Preciomaximo','Preciopromedio']:
     df[x]= pd.to_numeric(df[x], errors='coerce')
 
 df.Desde= pd.to_datetime(df.Desde,dayfirst=True)
 df.Hasta= pd.to_datetime(df.Hasta,dayfirst=True)
 
-for x in ['Mercado','Variedad','Calidad','Origen','Unidad decomercialización']:
-    print(df[x].value_counts())
-    print()
+# elimina acento y caracteres extraños
+for x0 in ['Producto','Variedad','Calidad','Origen','Unidad decomercializacion']:
+    df[x0]=df[x0].apply(lambda x: limpia(x))
+
+# elimina acento y caracteres extraños de los nombres de columnas
+df.columns= pd.Series(df.columns).apply(lambda x: limpia(x))
 
 #%%
 
@@ -44,13 +54,18 @@ for x in ['Mercado','Variedad','Calidad','Origen','Unidad decomercialización']:
 
 dic_grande= {}
 keys1= list(df.Producto.unique()) # tomate, papa, etc...
-keys2= ['Mercado','Variedad','Calidad','Origen','Unidad decomercialización']
+keys1.sort()
+
+keys2= ['Mercado','Variedad','Calidad','Origen','Unidad decomercializacion']
+keys1.sort()
 
 # puebla diccionario grande en base a todos los "chicos por producto"
 for i in keys1:    
     values2= [list(df[df.Producto==i][x].unique()) for x in keys2]
-    dic_chico = dict(zip(keys2, values2))  
+    [x.sort() for x in values2]
+    dic_chico= dict(zip(keys2, values2))  
     dic_grande[i]= dic_chico
+   
 
 #%%
 
@@ -64,7 +79,7 @@ with open(x, 'w') as fp:
 
     
     
-""" LLAMA DICCIONARIO """
-
-with open('diccioh_2019_5_16.json') as fp:
-    data= hjson.loads(fp.read())
+#""" LLAMA DICCIONARIO """
+#
+#with open('diccioh_2019_5_16.json') as fp:
+#    data= hjson.loads(fp.read())
