@@ -19,3 +19,9 @@ Modelos:
      style="float: center; margin-right: 10px;" />
 
 
+Definiciones:
+- todos los archivos de data se guardaron sin acentos. Por ende, luego de cada web scraping hay que remover
+los acentos para concatenar la data.
+
+- En base consumidor: para los productos AZUCAR y MIEL, la base no traía nombre de producto.
+Agregué a mano esos nombres de producto --> replicar en el scraping

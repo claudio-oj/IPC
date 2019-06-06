@@ -11,8 +11,15 @@ root= 'D:\\Dropbox\\Documentos\\IPC_ML\\'
 
 import os
 os.chdir(root+'Git')
-from aux_funcs import odepa_cons_impo, odepa_may_impo
+from aux_funcs import ipc_import,odepa_cons_impo, odepa_may_impo
 
 
-df= odepa_may_impo()
-df.plot()
+""" LIMON """
+df= ipc_import(root=root, producto='LIMON')
+df= df.join(odepa_may_impo())
+df= df.join(odepa_cons_impo(),rsuffix='_cons')
+
+# run model, elige modelo
+
+# guarda en carpeta modelo ganador
+

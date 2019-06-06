@@ -203,6 +203,7 @@ def limpia(s):
 
     import re
     from unicodedata import normalize
+    
     # -> NFD y eliminar diacríticos
     s = re.sub(
             r"([^n\u0300-\u036f]|n(?!\u0303(?![\u0300-\u036f])))[\u0300-\u036f]+", r"\1", 
@@ -212,6 +213,7 @@ def limpia(s):
     # -> NFC
     s = normalize( 'NFC', s)
     return s
+
 
 
 def ipc_import(root,producto):
@@ -369,7 +371,7 @@ def odepa_may_impo(root='D:\\Dropbox\\Documentos\\IPC_ML\\', producto='Limon'):
 ###############################################################################
 
 
-def odepa_cons_impo(root='D:\\Dropbox\\Documentos\\IPC_ML\\', producto='Limón'):
+def odepa_cons_impo(root='D:\\Dropbox\\Documentos\\IPC_ML\\', producto='Limon'):
     
     """ importa base odepa mayorista
     
@@ -382,29 +384,84 @@ def odepa_cons_impo(root='D:\\Dropbox\\Documentos\\IPC_ML\\', producto='Limón')
 
     import os
     os.chdir(root+'Git')
-    import pandas as pd
-#    from aux_funcs import P_equiv,limpia
+    import hjson
     
     
     """ 1.2   IMPORTA/FORMATEA/LIMPIA/ BASE DE DATOS ODEPA CONSUMIDOR """
     
-    if producto=='Limón':
+    if producto=='Limon':
     
-        df= pd.read_csv(root+'Data\\Bases_precio_consumidor\\precios_al_consumidor_Frutas.csv',
+        df= pd.read_csv(root+'Data\\precios_odepa_consum_total.csv',
                         sep="\t", encoding="latin-1",decimal=',', index_col=0)
         
         df= df[df.Producto.isin([producto])]
         
         df['Fecha inicio'] = pd.to_datetime(df['Fecha inicio'],dayfirst=True)
-        df['Fecha término']= pd.to_datetime(df['Fecha término'],dayfirst=True)    
+        df['Fecha termino']= pd.to_datetime(df['Fecha termino'],dayfirst=True)  
         
-        # pasa a mayuscula los valores de la col Producto
-        df['Producto']=df['Producto'].map(lambda x: str(x).upper())
+        # transforma str --> numeric
+        df['Precio promedio']= pd.to_numeric(df['Precio promedio'], errors='coerce')
         
-        # elimina acento y caracteres extraños
-        df['Producto']=df['Producto'].apply(lambda x: limpia(x))
+            
+        """ filtra según criterios de diccionario """
         
-        return df
+        with open(root+'Git\\diccionarios\\diccio_odepa_consum.json') as fp:
+            d= hjson.loads(fp.read())
+        
+        df= df[ df.Calidad.isin( d[producto]['Calidad']  )] if (d[producto]['Calidad'] != [str('nan')]) else df
+        df= df[ df.Procedencia.isin( d[producto]['Procedencia'] )] if (d[producto]['Procedencia'] != [str('nan')]) else df
+        df= df[ df.Region.isin( d[producto]['Region']  )] if (d[producto]['Region'] != [str('nan')]) else df
+        df= df[ df.Sector.isin( d[producto]['Sector']  )] if (d[producto]['Sector'] != [str('nan')]) else df
+        df= df[ df['Tipo punto monitoreo'].isin( d[producto]['Tipo punto monitoreo']  )] if (d[producto]['Tipo punto monitoreo'] != [str('nan')]) else df
+        df= df[ df.Unidad.isin( d[producto]['Unidad']  )] if (d[producto]['Unidad'] != [str('nan')]) else df
+        df= df[ df.Variedad.isin( d[producto]['Variedad']  )] if (d[producto]['Variedad'] != [str('nan')]) else df
+        
+        
+        """ creo df con index fechas unicas, para guardar series de calidades del limon."""
+        dfc= pd.DataFrame(index=df['Fecha termino'].unique())
+        
+        for c in df.Calidad.unique():
+            dfc[c]= df[['Calidad','Fecha termino','Precio promedio']][df.Calidad==c].groupby('Fecha termino').mean()
+        
+        # crea df con cambios porcentuales de cada CALIDAD del limon
+        dfcgrow= dfc.pct_change(limit=1)
+        
+        # pisa con nan's los ceros de la formula pct --> evita calc erroneos
+        dfcgrow= dfcgrow.where(dfc.isna()==False,dfc)
+        
+        # promedia los pct de cada calidad en una sola columna
+        dfcgrow= dfcgrow.mean(axis=1)
+    
+        # pisa los nan de crecimiento con el pct fila anterior
+        dfcgrow= dfcgrow.interpolate(method='pad')
+    
+    
+    
+        """     PUEBLA LOS NAN CON EL CRECIMIENTO PROMEDIO DE DFCGROW """
+        
+        for col in dfc.columns:
+            for ind,row in dfc[col].iteritems():
+                
+                if isnan(row)==True:
+                    # indice ordinal
+                    ilug= dfc[col].index.get_loc(ind)                   
+                    dfc[col][ind]= dfc[col].iloc[ilug-1] * (1+dfcgrow[ind])
+        
+        
+        # alarga el indice a nivel "cambio diario"
+        dfc= dfc.reindex( pd.date_range(start=dfc.index[0], end=dfc.index[-1]))
+        dfc= dfc.interpolate(method='index')
+        
+        #mensualiza
+        dfc= dfc.asfreq('M')
+        dfc= dfc.pct_change()
+        
+        dfc.dropna(inplace=True)
+        
+        return dfc
+
+    
+    
     
     else:
         return print('nada')
