@@ -5332,60 +5332,60 @@
         Region:
         [
             Region Metropolitana de Santiago
-            Region de Arica y Parinacota
-            Region de Coquimbo
-            Region de La Araucania
-            Region de Los Lagos
-            Region de Valparaiso
-            Region de Ñuble
-            Region del Biobio
-            Region del Maule
+            #Region de Arica y Parinacota
+            #Region de Coquimbo
+            #Region de La Araucania
+            #Region de Los Lagos
+            #Region de Valparaiso
+            #Region de Ñuble
+            #Region del Biobio
+            #Region del Maule
         ]
         Sector:
         [
-            Alemania - Pedro de Valdivia
-            Barrio Ingles - Estadio
-            Calera
+            #Alemania - Pedro de Valdivia
+            #Barrio Ingles - Estadio
+            #Calera
             Centro
-            Centro-Estacion
-            Chiguayante
-            Concepcion
-            Coquimbo
-            Curico
-            Diguillin
-            Frutillar
-            Itata
-            La Serena
-            Linares
-            Llanquihue
-            Los Angeles
+            #Centro-Estacion
+            #Chiguayante
+            #Concepcion
+            #Coquimbo
+            #Curico
+            #Diguillin
+            #Frutillar
+            #Itata
+            #La Serena
+            #Linares
+            #Llanquihue
+            #Los Angeles
             Norte
             Oriente
-            Osorno
-            Ovalle
-            Padre Las Casas
-            Penco
+            #Osorno
+            #Ovalle
+            #Padre Las Casas
+            #Penco
             Poniente
-            Pueblo nuevo
-            Puerto Montt
-            Puerto Varas
-            Punilla
-            Quillota
-            Quilpue
-            Recabarren
-            San Pedro de la Paz
+            #Pueblo nuevo
+            #Puerto Montt
+            #Puerto Varas
+            #Punilla
+            #Quillota
+            #Quilpue
+            #Recabarren
+            #San Pedro de la Paz
             Sur
-            Talca
-            Talcahuano-Hualpen
-            Valparaiso
-            Villa Alemana
-            Viña del Mar
-            nan
+            #Talca
+            #Talcahuano-Hualpen
+            #Valparaiso
+            #Villa Alemana
+            #Viña del Mar
+            #nan
         ]
         "Tipo punto monitoreo":
         [
             Feria libre
-            Mercado Minorista
+            #Mercado Minorista
             Supermercado
         ]
         Unidad:
@@ -6923,60 +6923,60 @@
         Region:
         [
             Region Metropolitana de Santiago
-            Region de Arica y Parinacota
-            Region de Coquimbo
+            #Region de Arica y Parinacota
+            #Region de Coquimbo
             Region de La Araucania
-            Region de Los Lagos
+            #Region de Los Lagos
             Region de Valparaiso
-            Region de Ñuble
+            #Region de Ñuble
             Region del Biobio
-            Region del Maule
+            #Region del Maule
         ]
         Sector:
         [
             Alemania - Pedro de Valdivia
-            Barrio Ingles - Estadio
-            Calera
+            #Barrio Ingles - Estadio
+            #Calera
             Centro
             Centro-Estacion
-            Chiguayante
+            #Chiguayante
             Concepcion
             Coquimbo
             Curico
-            Diguillin
-            Frutillar
-            Itata
+            #Diguillin
+            #Frutillar
+            #Itata
             La Serena
             Linares
-            Llanquihue
+            #Llanquihue
             Los Angeles
             Norte
             Oriente
-            Osorno
+            #Osorno
             Ovalle
             Padre Las Casas
             Penco
             Poniente
-            Pueblo nuevo
-            Puerto Montt
-            Puerto Varas
-            Punilla
-            Quillota
+            #Pueblo nuevo
+            #Puerto Montt
+            #Puerto Varas
+            #Punilla
+            #Quillota
             Quilpue
-            Recabarren
-            San Pedro de la Paz
+            #Recabarren
+            #San Pedro de la Paz
             Sur
             Talca
             Talcahuano-Hualpen
             Valparaiso
-            Villa Alemana
+            #Villa Alemana
             Viña del Mar
-            nan
+            #nan
         ]
         "Tipo punto monitoreo":
         [
             Feria libre
-            Mercado Minorista
+            #Mercado Minorista
             Supermercado
         ]
         Unidad:
@@ -6987,9 +6987,9 @@
         [
             Asterix
             Desiree
-            Karu
+            #Karu
             Patagonia
-            Rodeo
+            #Rodeo
         ]
     }
     "Pavo Osobuco":

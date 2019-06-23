@@ -4230,40 +4230,40 @@
     {
         Calidad:
         [
-            1a (cosecha lavada)
+            #1a (cosecha lavada)
             1a (cosecha)
-            1a (guarda)
-            1a (nueva lavada)
+            #1a (guarda)
+            #1a (nueva lavada)
             1a nueva(o)
-            2a (cosecha)
-            2a (delgada cosecha)
-            2a (delgada nueva)
-            2a (guarda)
-            2a nueva(o)
-            3a (revuelta cosecha)
-            3a (revuelta nueva)
-            Extra (muy buena nueva)
-            s/e (semillon cosecha)
-            s/e (semillon nueva)
+            #2a (cosecha)
+            #2a (delgada cosecha)
+            #2a (delgada nueva)
+            #2a (guarda)
+            #2a nueva(o)
+            #3a (revuelta cosecha)
+            #3a (revuelta nueva)
+            #Extra (muy buena nueva)
+            #s/e (semillon cosecha)
+            #s/e (semillon nueva)
         ]
         Mercado:
         [
-            Agrícola del Norte S.A. de Arica
+            #Agrícola del Norte S.A. de Arica
             Central Lo Valledor de Santiago
-            Femacal de La Calera
-            Feria Lagunitas de Puerto Montt
-            Macroferia Regional de Talca
-            Mapocho venta directa de Santiago
-            Terminal Hortofrutícola de Chillán
-            Terminal La Palmera de La Serena
-            Vega Central Mapocho de Santiago
-            Vega Modelo de Temuco
-            Vega Monumental Concepción
-            Vega poniente de Santiago
+            #Femacal de La Calera
+            #Feria Lagunitas de Puerto Montt
+            #Macroferia Regional de Talca
+            #Mapocho venta directa de Santiago
+            #Terminal Hortofrutícola de Chillán
+            #Terminal La Palmera de La Serena
+            #Vega Central Mapocho de Santiago
+            #Vega Modelo de Temuco
+            #Vega Monumental Concepción
+            #Vega poniente de Santiago
         ]
         Origen:
         [
-            Argentina
+            #Argentina
             Carahue
             Centro-norte
             Centro-sur
@@ -4312,12 +4312,12 @@
         ]
         "Unidad decomercializacion":
         [
-            $/envase 20 kilos
-            $/envase 45 kilos
-            $/malla 20 kilos
-            $/malla 25 kilos
-            $/malla 40 kilos
-            $/malla 50 kilos
+            #$/envase 20 kilos
+            #$/envase 45 kilos
+            #$/malla 20 kilos
+            #$/malla 25 kilos
+            #$/malla 40 kilos
+            #$/malla 50 kilos
             $/saco 25 kilos
             $/saco 40 kilos
             $/saco 50 kilos
@@ -4326,19 +4326,19 @@
         Variedad:
         [
             Asterix
-            Blanca(o)
+            #Blanca(o)
             Cardinal
             Desiree
             Karu
-            Monalisa
+            #Monalisa
             Patagonia
-            Pehuenche
+            #Pehuenche
             Pukara
-            Rodeo
+            #Rodeo
             Rosara
-            Sin especificar
-            Spunta
-            Yagana
+            #Sin especificar
+            #Spunta
+            #Yagana
         ]
     }
     Papaya:
@@ -5494,29 +5494,29 @@
     {
         Calidad:
         [
-            1a (cosecha)
-            Cuarta
-            Especial
-            Extra
-            Extra (muy buena)
+            #1a (cosecha)
+            #Cuarta
+            #Especial
+            #Extra
+            #Extra (muy buena)
             Primera
             Segunda
             Tercera
         ]
         Mercado:
         [
-            Agrícola del Norte S.A. de Arica
+            #Agrícola del Norte S.A. de Arica
             Central Lo Valledor de Santiago
-            Comercializadora del Agro de Limarí
-            Femacal de La Calera
-            Feria Lagunitas de Puerto Montt
-            Macroferia Regional de Talca
+            #Comercializadora del Agro de Limarí
+            #Femacal de La Calera
+            #Feria Lagunitas de Puerto Montt
+            #Macroferia Regional de Talca
             Mapocho venta directa de Santiago
-            Terminal Hortofrutícola de Chillán
-            Terminal La Palmera de La Serena
+            #Terminal Hortofrutícola de Chillán
+            #Terminal La Palmera de La Serena
             Vega Central Mapocho de Santiago
-            Vega Modelo de Temuco
-            Vega Monumental Concepción
+            #Vega Modelo de Temuco
+            #Vega Monumental Concepción
             Vega poniente de Santiago
         ]
         Origen:
@@ -5576,14 +5576,14 @@
         ]
         Variedad:
         [
-            Cherry
-            Conservero
-            Estandar
-            Invernadero
+            #Cherry
+            #Conservero
+            #Estandar
+            #Invernadero
             Larga vida
-            Paisana(o)
+            #Paisana(o)
             Semiduro
-            Sin especificar
+            #Sin especificar
         ]
     }
     Tumbo:

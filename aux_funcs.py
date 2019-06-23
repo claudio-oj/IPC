@@ -12,9 +12,11 @@ import matplotlib.pyplot as plt
 plt.style.use('seaborn')
 
 from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import PolynomialFeatures  
+from sklearn.preprocessing import PolynomialFeatures 
+from sklearn.pipeline import Pipeline 
+from sklearn.multioutput import MultiOutputRegressor
 
 
 def crealag(df, n):
@@ -29,11 +31,12 @@ def da(Y_test,Y_pred):
     Y_test, Y_pred: pd.Series"""
     
     prod= Y_test * Y_pred   
+    prod= pd.Series(prod.flatten())
     
     return prod.gt(0).sum() / len(prod)
 
 
-def run_model(model, X, Y,lags=False,grafs=True):
+def run_model(model, X, Y,lags=False,n_splits=50,degree=1,grafs=True):
     """ Corre modelos de Machine Learning, escala data, entrega metricas de performance
     y crea graficos
     
@@ -67,40 +70,41 @@ def run_model(model, X, Y,lags=False,grafs=True):
         
         # elimina las filas que quedan en desuso x la creación de nan's
         X.dropna(inplace=True)
-        Y=Y.iloc[lags[-1]:,:]
-        
-    # solo define el largo de la muestra de trainig
-    X_train, _, _, _= train_test_split(X,Y, test_size=0.2)
-    m0= len(X_train.copy())
+        Y= Y.iloc[lags[-1]:,:]
+
     
     train_errors, test_errors, test_da, perc75_errors, perc95_errors=[],[],[],[],[]
     
-    #escala la data
-    poly_features= PolynomialFeatures(degree=1,include_bias=False)
-    data_poly= poly_features.fit_transform(X)
-    scaler= StandardScaler()
-    data_poly= scaler.fit_transform(data_poly)
+    pipe= Pipeline([
+        ("poly_feat", PolynomialFeatures(degree=degree,include_bias=False)),
+        ("scaler", StandardScaler()),
+        ("model", MultiOutputRegressor(model))])
     
-    for m in range(5,m0+1):
+    
+    # time series cross validator
+    tscv = TimeSeriesSplit(n_splits=n_splits)
+    for train_index, test_index in tscv.split(X):
+        X_train, X_test = X.values[train_index], X.values[test_index]
+        Y_train, Y_test = Y.values[train_index], Y.values[test_index]
         
-        X_train, X_test, Y_train, Y_test= train_test_split(data_poly,Y,test_size=0.2)
-                
-        model.fit(X_train[:m],Y_train[:m])
-        Y_train_pred= model.predict(X_train)
-        Y_test_pred= model.predict(X_test)
+        # Fit        
+        pipe.fit(X_train,Y_train)
+        Y_train_pred= pipe.predict(X_train)
+        Y_test_pred = pipe.predict(X_test)
         
         train_errors.append(mean_absolute_error(Y_train,Y_train_pred))
-        test_errors.append(mean_absolute_error(Y_test,Y_test_pred))
-        test_da.append( da(Y_test,Y_test_pred) )
+        test_errors.append( mean_absolute_error(Y_test,Y_test_pred))
+        test_da.append(     da(Y_test,Y_test_pred) )
         
-        perc95_errors.append(np.percentile(abs(Y_test.values-Y_test_pred) ,95))
-        perc75_errors.append(np.percentile(abs(Y_test.values-Y_test_pred) ,75))
+        perc95_errors.append(np.percentile(abs(Y_test-Y_test_pred) ,95))
+        perc75_errors.append(np.percentile(abs(Y_test-Y_test_pred) ,75))
     
     train_errors= np.asarray(train_errors)
     test_errors= np.asarray(test_errors)
     
-    learning_curves=np.concatenate((train_errors.reshape(-1,1),test_errors.reshape(-1,1)),axis=1)
-    learning_curves=pd.DataFrame(data=learning_curves,columns=["train_error","test_error"])
+    learning_curves= np.concatenate((train_errors.reshape(-1,1),test_errors.reshape(-1,1)),axis=1)
+    learning_curves= pd.DataFrame(data=learning_curves,columns=["train_error","test_error"])
+    
     
     if grafs==True:        
     
@@ -115,7 +119,7 @@ def run_model(model, X, Y,lags=False,grafs=True):
         
         #Modelo Final    
         Y2= pd.DataFrame(index=Y.index)
-        Y2['Model_pred']= model.predict(X)
+        Y2['Model_pred']= pipe.predict(X)
         Y2['Actual']=Y
         Y2.plot(figsize=(11,6),fontsize=22)
         plt.title("Model vs Actual", fontsize=22)
@@ -233,7 +237,7 @@ def ipc_import(root,producto):
     df1= df1[df1['GLOSA']==producto]
     df1= df1.T
     df1= df1.iloc[1:]
-    df1.columns=["ine"] 
+    df1.columns=[str(producto)]
     df1.index= pd.to_datetime(df1.index)
     
     
@@ -242,7 +246,7 @@ def ipc_import(root,producto):
     df2= df2[df2['GLOSA']==producto]
     df2= df2.T
     df2= df2.iloc[1:]
-    df2.columns=["ine"]
+    df2.columns=[str(producto)]
     df2.index= pd.to_datetime(df2.index)
     
     
@@ -253,9 +257,8 @@ def ipc_import(root,producto):
     
     # crea indice datetime
     df3.index= [parse(str(df3['Año'][x])+' '+str(df3['Mes'][x]) +' 1') for x in df3.index]
-    df3 = df3.rename(columns={'Índice': 'ine'})
-    df3= df3[['ine']]
-    
+    df3 = df3.rename(columns={'Índice': str(producto)})
+    df3= df3[[str(producto)]]
     
     """ 4= 1+2+3 concat todo """
     df= pd.concat([df1,df2,df3])
@@ -389,7 +392,8 @@ def odepa_cons_impo(root='D:\\Dropbox\\Documentos\\IPC_ML\\', producto='Limon'):
     
     """ 1.2   IMPORTA/FORMATEA/LIMPIA/ BASE DE DATOS ODEPA CONSUMIDOR """
     
-    if producto=='Limon':
+    if producto==producto:
+#    if producto in ['Limon','Papa']:
     
         df= pd.read_csv(root+'Data\\precios_odepa_consum_total.csv',
                         sep="\t", encoding="latin-1",decimal=',', index_col=0)
